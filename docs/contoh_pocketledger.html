@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PocketLedger Retro</title>
+    <!-- Tailwind CSS v3 Play CDN (Berjalan lancar secara lokal) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+          darkMode: 'class',
+        }
+    </script>
+    <style>
+        :root, .theme-light {
+          --bg-app: #FDFDFD; --bg-card: #FFFFFF; --bg-input: #FFFFFF;
+          --text-main: #000000; --text-sub: #737373; --border-main: #000000;
+        }
+        .dark, .theme-dark {
+          --bg-app: #121214; --bg-card: #1E1E22; --bg-input: #121214;
+          --text-main: #FFFFFF; --text-sub: #A3A3A3; --border-main: #FFFFFF;
+        }
+        html, body { 
+          background-color: var(--bg-app) !important; 
+          color: var(--text-main) !important; 
+          font-family: 'Share Tech Mono', monospace;
+        }
+        input, select, textarea, option { 
+          background-color: var(--bg-input) !important; 
+          color: var(--text-main) !important; 
+          border: 2px solid var(--border-main) !important; 
+        }
+        .pixel-text { font-family: 'VT323', monospace; }
+        .retro-shadow { box-shadow: 4px 4px 0px 0px var(--border-main); }
+        .retro-shadow-sm { box-shadow: 2px 2px 0px 0px var(--border-main); }
+        .retro-shadow-active:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0px 0px var(--border-main); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between select-none transition-colors duration-200">
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="flex-grow flex items-center justify-center px-4">
+        <div class="max-w-sm w-full border-2 border-[var(--border-main)] p-5 retro-shadow text-center transition-colors duration-200" style="background-color: var(--bg-card)">
+            <span class="text-4xl block mb-1">🔑</span>
+            <h2 class="pixel-text text-3xl font-bold tracking-wider leading-none mb-4">AKSES KAS PRIBADI</h2>
+            <form id="login-form" class="space-y-4 text-left text-xs font-bold">
+                <div id="login-error" class="hidden p-2 bg-red-100 text-red-700 text-center">⚠️ Kredensial salah!</div>
+                <div>
+                    <label class="block mb-1">ID USER</label>
+                    <input type="text" id="username" class="w-full p-1.5 outline-none" placeholder="user" required>
+                </div>
+                <div>
+                    <label class="block mb-1">PASSWORD</label>
+                    <input type="password" id="password" class="w-full p-1.5 outline-none" placeholder="pass123" required>
+                </div>
+                <button type="submit" class="w-full bg-yellow-400 text-black font-bold py-2 border-2 border-black retro-shadow-sm retro-shadow-active uppercase tracking-widest">ENTER CABINET</button>
+            </form>
+            <div class="mt-4 border-2 border-dashed border-gray-400 p-2.5 text-[10px] text-gray-500 text-center font-bold">
+                LOGIN: <span class="text-yellow-600">user</span> | PASS: <span class="text-yellow-600">pass123</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP DASHBOARD (Hidden by Default) -->
+    <div id="main-app" class="hidden flex-col justify-between flex-grow">
+        <!-- HEADER -->
+        <header class="border-b-2 border-[var(--border-main)] py-3 px-4" style="background-color: var(--bg-card)">
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-black pixel-text leading-none">POCKET_LEDGER</h1>
+                    <p class="text-[8px] opacity-60 font-bold uppercase tracking-widest">Edisi Kas Mandiri Harian</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="theme-toggle" class="text-xs bg-yellow-400 text-black font-bold border-2 border-black px-2 py-1 retro-shadow-sm retro-shadow-active">🌙 DARK_MODE</button>
+                    <button id="logout-btn" class="text-xs font-bold border-2 border-[var(--border-main)] px-2 py-1 retro-shadow-sm retro-shadow-active">LOGOUT</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD CONTAINER -->
+        <main class="flex-grow max-w-6xl mx-auto w-full px-4 py-6 space-y-6">
+            <!-- CARDS STATS -->
+            <section class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs font-bold">
+                <div class="border-2 border-[var(--border-main)] p-3 retro-shadow" style="background-color: var(--bg-card)">
+                    <span>💰 SISA SALDO</span>
+                    <p id="stat-saldo" class="text-base mt-1">Rp 0</p>
+                </div>
+                <div class="border-2 border-[var(--border-main)] p-3 retro-shadow" style="background-color: var(--bg-card)">
+                    <span>📊 BUDGET BULANAN</span>
+                    <p id="stat-budget" class="text-base mt-1">0% Terpakai</p>
+                </div>
+                <div class="border-2 border-[var(--border-main)] p-3 retro-shadow text-emerald-600 dark:text-emerald-400" style="background-color: var(--bg-card)">
+                    <span>📈 PEMASUKAN</span>
+                    <p id="stat-pemasukan" class="text-base mt-1">+Rp 0</p>
+                </div>
+                <div class="border-2 border-[var(--border-main)] p-3 retro-shadow text-red-500" style="background-color: var(--bg-card)">
+                    <span>📉 PENGELUARAN</span>
+                    <p id="stat-pengeluaran" class="text-base mt-1">-Rp 0</p>
+                </div>
+            </section>
+
+            <!-- WORKSPACE -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- CONTROLS -->
+                <div class="space-y-4">
+                    <div class="border-2 border-[var(--border-main)] p-4 retro-shadow" style="background-color: var(--bg-card)">
+                        <h4 class="font-bold mb-2 text-xs">LIMIT ANGGARAN</h4>
+                        <input type="range" id="budget-slider" min="1000000" max="10000000" step="500000" value="3000000" class="w-full accent-yellow-400 cursor-pointer" />
+                        <p id="budget-limit-text" class="text-xs font-bold mt-1">Target: Rp 3.000.000</p>
+                    </div>
+
+                    <div class="border-2 border-[var(--border-main)] p-4 retro-shadow" style="background-color: var(--bg-card)">
+                        <h4 class="font-bold mb-2 text-xs">METERAN KAS CEPAT</h4>
+                        <form id="tx-form" class="space-y-2.5 text-xs font-bold">
+                          <div class="grid grid-cols-2 gap-2 border border-black p-1">
+                            <button type="button" id="btn-type-keluar" class="py-1 bg-black text-white dark:bg-white dark:text-black">🔴 KELUAR</button>
+                            <button type="button" id="btn-type-masuk" class="py-1 text-slate-400">🟢 MASUK</button>
+                          </div>
+                          <input type="number" id="tx-amount" required class="w-full p-1 outline-none" placeholder="Nominal Rp..." />
+                          <select id="tx-category" class="w-full p-1 outline-none rounded-none cursor-pointer">
+                            <!-- Opsi diisi dinamis oleh JS -->
+                          </select>
+                          <input type="text" id="tx-description" class="w-full p-1 outline-none" placeholder="Keterangan..." required />
+                          <button type="submit" class="w-full bg-yellow-400 text-black font-bold py-1 border border-black retro-shadow-sm retro-shadow-active transition uppercase">KIRIM</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- BUKU ARUS KAS -->
+                <div class="lg:col-span-2">
+                    <div class="border-2 border-[var(--border-main)] p-4 retro-shadow" style="background-color: var(--bg-card)">
+                        <h3 class="text-xl font-bold mb-3">BUKU ARUS KAS</h3>
+                        <div class="flex gap-2 mb-3">
+                          <input type="text" id="search-box" placeholder="CARI KETERANGAN..." class="p-1 flex-grow text-xs outline-none uppercase font-bold" />
+                          <select id="filter-type" class="text-xs p-1 outline-none cursor-pointer font-bold">
+                            <option value="Semua">Semua</option>
+                            <option value="Pemasukan">Pemasukan</option>
+                            <option value="Pengeluaran">Pengeluaran</option>
+                          </select>
+                        </div>
+                        <div id="transactions-list" class="space-y-2">
+                            <!-- Diisi oleh JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="border-t-2 border-[var(--border-main)] py-3 text-center text-[9px] opacity-60 font-bold uppercase" style="background-color: var(--bg-card)">
+            © 2026 POCKET_LEDGER. Vanila JS No-Blank Edition.
+        </footer>
+    </div>
+
+    <!-- BUSINESS LOGIC JAVASCRIPT VANILA -->
+    <script>
+        // --- DATA MOCK AWAL ---
+        let currentTheme = localStorage.getItem('pocketledger_theme') || 'light';
+        let budgetLimit = 3000000;
+        let activeType = 'Pengeluaran';
+
+        let transactions = [
+          { id: '1', type: 'Pengeluaran', category: '🍔 Makanan', amount: 45000, date: '2026-06-22', description: 'Makan siang nasi padang' },
+          { id: '2', type: 'Pemasukan', category: '💼 Gaji', amount: 4500000, date: '2026-06-01', description: 'Gaji freelance developer' },
+          { id: '3', type: 'Pengeluaran', category: '🚗 Transport', amount: 25000, date: '2026-06-18', description: 'Isi saldo e-money commuter' }
+        ];
+
+        // --- DOM ELEMENTS ---
+        const loginScreen = document.getElementById('login-screen');
+        const mainApp = document.getElementById('main-app');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const themeToggle = document.getElementById('theme-toggle');
+        const logoutBtn = document.getElementById('logout-btn');
+        const txForm = document.getElementById('tx-form');
+        const btnTypeKeluar = document.getElementById('btn-type-keluar');
+        const btnTypeMasuk = document.getElementById('btn-type-masuk');
+        const txCategory = document.getElementById('tx-category');
+        const budgetSlider = document.getElementById('budget-slider');
+        const budgetLimitText = document.getElementById('budget-limit-text');
+        const transactionsList = document.getElementById('transactions-list');
+        const searchBox = document.getElementById('search-box');
+        const filterType = document.getElementById('filter-type');
+
+        // Opsi Kategori Berdasarkan Alur
+        const categories = {
+            Pengeluaran: ['🍔 Makanan', '🚗 Transport', '🏠 Kost & Bulanan', '🛍️ Belanja'],
+            Pemasukan: ['💼 Gaji', '💰 Penjualan', '🎁 Pemberian']
+        };
+
+        // --- MANAJEMEN TEMA (DARK MODE) ---
+        function applyTheme(theme) {
+            const root = document.documentElement;
+            if (theme === 'dark') {
+                root.classList.add('dark', 'theme-dark');
+                root.classList.remove('theme-light');
+                themeToggle.innerText = '☀️ LIGHT_MODE';
+            } else {
+                root.classList.add('theme-light');
+                root.classList.remove('dark', 'theme-dark');
+                themeToggle.innerText = '🌙 DARK_MODE';
+            }
+            localStorage.setItem('pocketledger_theme', theme);
+        }
+        applyTheme(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(currentTheme);
+        });
+
+        // --- FORM ALUR KAS TYPE TOGGLE ---
+        function updateCategoryOptions() {
+            txCategory.innerHTML = '';
+            categories[activeType].forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.innerText = cat;
+                txCategory.appendChild(opt);
+            });
+        }
+        updateCategoryOptions();
+
+        btnTypeKeluar.addEventListener('click', () => {
+            activeType = 'Pengeluaran';
+            btnTypeKeluar.className = 'py-1 bg-black text-white dark:bg-white dark:text-black font-bold';
+            btnTypeMasuk.className = 'py-1 text-slate-400 font-bold';
+            updateCategoryOptions();
+        });
+
+        btnTypeMasuk.addEventListener('click', () => {
+            activeType = 'Pemasukan';
+            btnTypeMasuk.className = 'py-1 bg-yellow-400 text-black border border-black font-bold';
+            btnTypeKeluar.className = 'py-1 text-slate-400 font-bold';
+            updateCategoryOptions();
+        });
+
+        // --- RENDER & KALKULASI DATA ---
+        function renderDashboard() {
+            let totalPemasukan = 0;
+            let totalPengeluaran = 0;
+
+            transactions.forEach(t => {
+                if (t.type === 'Pemasukan') totalPemasukan += t.amount;
+                if (t.type === 'Pengeluaran') totalPengeluaran += t.amount;
+            });
+
+            const sisaSaldo = totalPemasukan - totalPengeluaran;
+            const usagePercent = Math.min(100, (totalPengeluaran / budgetLimit) * 100);
+
+            // Update Teks Stat Panel
+            document.getElementById('stat-saldo').innerText = `Rp ${sisaSaldo.toLocaleString('id-ID')}`;
+            document.getElementById('stat-budget').innerText = `${usagePercent.toFixed(0)}% Terpakai`;
+            document.getElementById('stat-pemasukan').innerText = `+Rp ${totalPemasukan.toLocaleString('id-ID')}`;
+            document.getElementById('stat-pengeluaran').innerText = `-Rp ${totalPengeluaran.toLocaleString('id-ID')}`;
+
+            // Render List Transaksi dengan Filter
+            transactionsList.innerHTML = '';
+            const q = searchBox.value.toLowerCase();
+            const f = filterType.value;
+
+            const filtered = transactions.filter(t => {
+                const matchQ = t.description.toLowerCase().includes(q) || t.category.toLowerCase().includes(q);
+                const matchF = f === 'Semua' || t.type === f;
+                return matchQ && matchF;
+            });
+
+            if (filtered.length === 0) {
+                transactionsList.innerHTML = `<div class="text-center py-4 border border-dashed border-gray-400 opacity-60">Catatan Kas Tidak Ditemukan</div>`;
+                return;
+            }
+
+            filtered.forEach(tx => {
+                const row = document.createElement('div');
+                row.className = 'border p-2.5 flex justify-between items-center text-xs transition-colors';
+                row.style.borderColor = 'var(--border-main)';
+                row.innerHTML = `
+                    <div>
+                        <p class="font-bold uppercase">${tx.description}</p>
+                        <p class="text-[10px] opacity-50 font-bold">${tx.category} | ${tx.date}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <p class="font-bold ${tx.type === 'Pemasukan' ? 'text-emerald-500' : 'text-red-500'}">
+                            ${tx.type === 'Pemasukan' ? '+' : '-'}Rp ${tx.amount.toLocaleString('id-ID')}
+                        </p>
+                        <button onclick="deleteTx('${tx.id}')" class="text-gray-400 hover:text-red-500 font-bold cursor-pointer">[X]</button>
+                    </div>
+                `;
+                transactionsList.appendChild(row);
+            });
+        }
+
+        // Fungsi Hapus Transaksi (D)
+        window.deleteTx = function(id) {
+            transactions = transactions.filter(t => t.id !== id);
+            renderDashboard();
+        }
+
+        // --- AUTHENTICATION FLOW ---
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value.trim().toLowerCase();
+            const pass = document.getElementById('password').value;
+
+            if (user === 'user' && pass === 'pass123') {
+                loginScreen.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                mainApp.classList.add('flex');
+                loginError.classList.add('hidden');
+                renderDashboard();
+            } else {
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            mainApp.classList.remove('flex');
+            mainApp.classList.add('hidden');
+            loginScreen.classList.remove('hidden');
+            document.getElementById('password').value = '';
+        });
+
+        // --- SUBMIT TRANSAKSI BARU (C) ---
+        txForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const amt = parseInt(document.getElementById('tx-amount').value);
+            const desc = document.getElementById('tx-description').value;
+            const cat = txCategory.value;
+
+            if (!amt || amt <= 0) return;
+
+            transactions.unshift({
+                id: Date.now().toString(),
+                type: activeType,
+                category: cat,
+                amount: amt,
+                date: new Date().toISOString().split('T')[0],
+                description: desc
+            });
+
+            document.getElementById('tx-amount').value = '';
+            document.getElementById('tx-description').value = '';
+            renderDashboard();
+        });
+
+        // --- CONTROL EVENT LISTENERS ---
+        budgetSlider.addEventListener('input', (e) => {
+            budgetLimit = parseInt(e.target.value);
+            budgetLimitText.innerText = `Target: Rp ${budgetLimit.toLocaleString('id-ID')}`;
+            renderDashboard();
+        });
+
+        searchBox.addEventListener('input', renderDashboard);
+        filterType.addEventListener('change', renderDashboard);
+    </script>
+</body>
+</html>
