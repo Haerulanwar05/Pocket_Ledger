@@ -1,17 +1,24 @@
 <?php
 // Vercel Serverless Front Controller
-// Mengatur working directory ke root proyek agar semua path include/require berfungsi normal seperti di XAMPP
-chdir(__DIR__ . '/..');
+// Set ke root proyek terlebih dahulu
+$root = __DIR__ . '/..';
+chdir($root);
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// Routing ke file PHP tujuan
 if ($uri === '/' || $uri === '' || $uri === '/index.php') {
     require 'index.php';
 } else {
     $file = ltrim($uri, '/');
     if (file_exists($file) && is_file($file)) {
-        require $file;
+        // Pindah working directory ke folder file tersebut agar relative path (seperti '../config/db.php') berfungsi persis seperti di XAMPP
+        $dir = dirname($file);
+        if ($dir !== '.' && $dir !== '') {
+            chdir($dir);
+            require basename($file);
+        } else {
+            require $file;
+        }
     } else {
         http_response_code(404);
         echo "404 Not Found: File $file tidak ditemukan.";
