@@ -1,11 +1,14 @@
 <?php
-$host = '127.0.0.1';
-$db   = 'pocketledger';
-$user = 'root';
-$pass = '';
+// Mendukung pemuatan dari Environment Variables (Untuk Vercel / Cloud Hosting)
+// Jika tidak ada ENV, akan menggunakan nilai default untuk XAMPP Lokal (127.0.0.1)
+$host = getenv('DB_HOST') ?: '127.0.0.1';
+$db   = getenv('DB_NAME') ?: 'pocketledger';
+$user = getenv('DB_USER') ?: 'root';
+$pass = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '';
+$port = getenv('DB_PORT') ?: '3306';
 $charset = 'utf8mb4';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,

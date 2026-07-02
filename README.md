@@ -137,4 +137,34 @@ Ikuti langkah-langkah berikut untuk menjalankan aplikasi PocketLedger di kompute
     *   Anda akan diarahkan ke halaman **Login**. Silakan klik tautan **Register** untuk mendaftarkan akun baru terlebih dahulu, kemudian masuk dan nikmati pengelolaan kas finansial Anda!
 
 ---
+
+## 🚀 Panduan Deployment ke Vercel (Cloud Hosting)
+
+Aplikasi PocketLedger didesain agar siap dipublikasikan ke platform *cloud hosting* **Vercel** menggunakan arsitektur *Serverless PHP Runtime*. Karena Vercel beroperasi secara *serverless*, berikut adalah langkah-langkah penyiapan yang harus dipenuhi:
+
+### 1. Penyediaan Basis Data Cloud (Cloud MySQL)
+Karena lingkungan serverless Vercel tidak memiliki server database lokal (`localhost`), Anda wajib menggunakan penyedia layanan database MySQL berbasis *cloud* gratis/berbayar seperti **Aiven**, **TiDB Cloud**, **Railway**, atau **PlanetScale**.
+*   Buat database baru pada penyedia cloud pilihan Anda.
+*   Jalankan (*import*) berkas skema database `docs/database.sql` ke dalam cloud database tersebut.
+*   Catat informasi kredensial koneksi cloud database Anda: *Host URL*, *Port*, *Database Name*, *Username*, dan *Password*.
+
+### 2. Konfigurasi Repositori Git
+Proyek ini telah dilengkapi dengan 2 konfigurasi otomatis untuk mendukung Vercel:
+*   **`vercel.json`**: Menginstruksikan Vercel untuk memproses berkas `.php` menggunakan *runtime* resmi/komunitas `vercel-php`.
+*   **`config/db.php`**: Telah dikonfigurasikan agar secara otomatis membaca *Environment Variables* di cloud serverless atau *fallback* ke `127.0.0.1` saat dijalankan di XAMPP lokal.
+
+Unggah (*push*) seluruh kode proyek ini ke repositori **GitHub** Anda.
+
+### 3. Pengaturan Impor Proyek di Vercel Dasbor
+1.  Masuk ke dasbor [Vercel](https://vercel.com/) dan klik **Add New Project**.
+2.  Impor repositori GitHub proyek **PocketLedger** Anda.
+3.  Sebelum menekan tombol *Deploy*, buka menu **Environment Variables** pada pengaturan proyek Vercel tersebut dan tambahkan variabel berikut sesuai dengan kredensial Cloud MySQL Anda:
+    *   `DB_HOST`: Alamat host cloud database (misal: `mysql-xxxx.aivencloud.com`)
+    *   `DB_PORT`: Port database (misal: `19810` atau `3306`)
+    *   `DB_NAME`: Nama database (misal: `defaultdb` atau `pocketledger`)
+    *   `DB_USER`: Username cloud database
+    *   `DB_PASS`: Kata sandi cloud database
+4.  Klik **Deploy**. Vercel akan mengompilasi aplikasi PHP Anda menjadi *Serverless Functions* yang super cepat dan aplikasi Anda siap diakses oleh publik dari seluruh dunia!
+
+---
 *PocketLedger Web Application © 2026 — Developed for Final Project Submission.*
