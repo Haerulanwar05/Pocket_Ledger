@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'config/db.php';
+require_once __DIR__ . '/config/db.php';
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
@@ -11,7 +11,7 @@ $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 $budgetLimit = $user->monthly_budget_limit;
 
-include 'includes/header.php';
+include __DIR__ . '/includes/header.php';
 ?>
 
 <div class="flex-col justify-between flex-grow flex relative overflow-hidden" id="main-app" style="background-image: radial-gradient(rgba(140, 140, 140, 0.3) 1.5px, transparent 1.5px), linear-gradient(to right, rgba(140, 140, 140, 0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(140, 140, 140, 0.12) 1px, transparent 1px); background-size: 16px 16px, 32px 32px, 32px 32px;">

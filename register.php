@@ -4,7 +4,7 @@ if (isset($_SESSION['user_id'])) {
     header('Location: index.php');
     exit;
 }
-include 'includes/header.php';
+include __DIR__ . '/includes/header.php';
 ?>
 <div class="flex-grow flex items-center justify-center px-4 relative overflow-hidden py-14" style="background-image: radial-gradient(rgba(140, 140, 140, 0.35) 1.5px, transparent 1.5px), linear-gradient(to right, rgba(140, 140, 140, 0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(140, 140, 140, 0.15) 1px, transparent 1px); background-size: 16px 16px, 32px 32px, 32px 32px;">
     <!-- Decorative Background Badges -->
