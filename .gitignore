@@ -1,0 +1,45 @@
+# ==========================================
+# PocketLedger Git Ignore Configuration
+# ==========================================
+
+# 1. Sistem Operasi (OS Generated Files)
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# 2. Editor & IDE (VSCode, JetBrains, Sublime, dll.)
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-project
+*.sublime-workspace
+
+# 3. Kredensial & Konfigurasi Rahasia Lokal
+.env
+.env.local
+.env.*.local
+config/db_secret.php
+
+# 4. Berkas Log & Temporary Data
+*.log
+error_log
+access_log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/tmp/
+/temp/
+
+# 5. Direktori AI & Cache Eksternal
+.gemini/
+scratch/
+*.cache
